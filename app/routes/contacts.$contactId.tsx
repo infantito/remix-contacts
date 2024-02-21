@@ -1,26 +1,25 @@
 import { Form, useLoaderData } from '@remix-run/react'
+import { LoaderFunctionArgs, json } from '@remix-run/node'
+import invariant from 'tiny-invariant'
 
 import { getContact, type ContactRecord } from '../data'
-import { LoaderFunctionArgs, json } from '@remix-run/node'
 
 export async function loader(args: LoaderFunctionArgs) {
 	const { contactId } = args.params
 
-	if (contactId) {
-		const contact = await getContact(contactId)
+	invariant(contactId, 'Missing contactId param')
 
-		return json({ contact })
+	const contact = await getContact(contactId)
+
+	if (!contact) {
+		throw new Response('Contact not found', { status: 404 })
 	}
 
-	throw new Response('Contact not found', { status: 404 })
+	return json({ contact })
 }
 
 export default function Contact() {
 	const { contact } = useLoaderData<typeof loader>()
-
-	if (!contact) {
-		return <div>Contact not found</div>
-	}
 
 	return (
 		<div id="contact">
