@@ -4,6 +4,7 @@ import type {
 	LoaderFunctionArgs,
 } from '@remix-run/node'
 import {
+	Await,
 	Form,
 	Link,
 	Links,
@@ -13,6 +14,7 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
+	defer,
 	json,
 	redirect,
 	useLoaderData,
@@ -53,9 +55,9 @@ export async function loader(args: LoaderFunctionArgs) {
 
 	const q = url.searchParams.get('q')
 
-	const contacts = await getContacts(q)
+	const contacts = getContacts(q)
 
-	return json({ contacts, q })
+	return defer({ contacts, q })
 }
 
 /**
@@ -123,33 +125,39 @@ export default function App() {
 						</Form>
 					</div>
 					<nav>
-						{contacts.length ? (
-							<ul>
-								{contacts.map(contact => (
-									<li key={contact.id}>
-										<NavLink
-											className={({ isActive, isPending }) =>
-												isActive ? 'active' : isPending ? 'pending' : ''
-											}
-											to={`contacts/${contact.id}`}
-										>
-											{contact.first || contact.last ? (
-												<>
-													{contact.first} {contact.last}
-												</>
-											) : (
-												<i>No Name</i>
-											)}{' '}
-											{contact.favorite ? <span>★</span> : null}
-										</NavLink>
-									</li>
-								))}
-							</ul>
-						) : (
-							<p>
-								<i>No contacts</i>
-							</p>
-						)}
+						<React.Suspense fallback={<Loading />}>
+							<Await resolve={contacts}>
+								{list =>
+									list.length ? (
+										<ul>
+											{list.map(contact => (
+												<li key={contact.id}>
+													<NavLink
+														className={({ isActive, isPending }) =>
+															isActive ? 'active' : isPending ? 'pending' : ''
+														}
+														to={`contacts/${contact.id}`}
+													>
+														{contact.first || contact.last ? (
+															<>
+																{contact.first} {contact.last}
+															</>
+														) : (
+															<i>No Name</i>
+														)}{' '}
+														{contact.favorite ? <span>★</span> : null}
+													</NavLink>
+												</li>
+											))}
+										</ul>
+									) : (
+										<p>
+											<i>No contacts</i>
+										</p>
+									)
+								}
+							</Await>
+						</React.Suspense>
 					</nav>
 				</div>
 				<div
@@ -165,5 +173,17 @@ export default function App() {
 				<LiveReload />
 			</body>
 		</html>
+	)
+}
+
+function Loading() {
+	return (
+		<ul>
+			{Array.from({ length: 28 }).map((_, i) => (
+				<li key={i} style={{ margin: '0.25rem 0' }}>
+					<span className="skeleton" />
+				</li>
+			))}
+		</ul>
 	)
 }
