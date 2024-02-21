@@ -14,7 +14,7 @@ import {
 import { cssBundleHref } from '@remix-run/css-bundle'
 
 import appStylesHref from './app.css'
-import { getContacts } from './data'
+import { createEmptyContact, getContacts } from './data'
 
 export const links: LinksFunction = () =>
 	[
@@ -41,6 +41,17 @@ export async function loader() {
 	const contacts = await getContacts()
 
 	return json({ contacts })
+}
+
+/**
+ * @see https://remix.run/docs/en/main/route/action
+ *
+ * A `route action` is a server only function to handle data mutations and other actions.
+ */
+export async function action() {
+	const contact = await createEmptyContact()
+
+	return json({ contact })
 }
 
 export default function App() {
