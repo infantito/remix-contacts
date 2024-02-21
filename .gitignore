@@ -52,3 +52,4 @@ lerna-debug.log*
 # We're not changing these duing the workshop anyway
 # /app/components/ui/icon.svg
 # /app/components/ui/icon.tsx
+.vercel
