@@ -12,6 +12,7 @@ import {
 	json,
 	redirect,
 	useLoaderData,
+	useNavigation,
 } from '@remix-run/react'
 import { cssBundleHref } from '@remix-run/css-bundle'
 
@@ -58,6 +59,8 @@ export async function action() {
 
 export default function App() {
 	const { contacts } = useLoaderData<typeof loader>()
+
+	const navigation = useNavigation()
 
 	return (
 		<html lang="en">
@@ -115,7 +118,10 @@ export default function App() {
 						)}
 					</nav>
 				</div>
-				<div id="detail">
+				<div
+					id="detail"
+					className={navigation.state === 'loading' ? 'loading' : ''}
+				>
 					<Outlet />
 				</div>
 				<ScrollRestoration />
