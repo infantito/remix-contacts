@@ -9,6 +9,7 @@ import {
 	Scripts,
 	ScrollRestoration,
 	json,
+	redirect,
 	useLoaderData,
 } from '@remix-run/react'
 import { cssBundleHref } from '@remix-run/css-bundle'
@@ -51,7 +52,7 @@ export async function loader() {
 export async function action() {
 	const contact = await createEmptyContact()
 
-	return json({ contact })
+	return redirect(`/contacts/${contact.id}/edit`)
 }
 
 export default function App() {
