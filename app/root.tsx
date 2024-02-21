@@ -1,3 +1,4 @@
+import type { LinkDescriptor, LinksFunction } from '@remix-run/node'
 import {
 	Form,
 	Links,
@@ -6,6 +7,25 @@ import {
 	Scripts,
 	ScrollRestoration,
 } from '@remix-run/react'
+
+import appStylesHref from './app.css'
+import { cssBundleHref } from '@remix-run/css-bundle'
+
+export const links: LinksFunction = () =>
+	[
+		{
+			rel: 'stylesheet',
+			href: appStylesHref,
+		},
+		/**
+		 * Use the cssBundleHref to include the CSS bundle in the HTML.
+		 *
+		 * It should be conditionally included because the css imports could be empty.
+		 */
+		(cssBundleHref
+			? { rel: 'stylesheet', href: cssBundleHref }
+			: null) as LinkDescriptor,
+	].filter(Boolean)
 
 export default function App() {
 	return (
